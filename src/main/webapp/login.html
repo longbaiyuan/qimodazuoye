@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 · 智税通 · 税务业务基础管理系统</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="login-page">
+<div class="login-shell">
+    <section class="login-brand">
+        <div class="brand-mark">
+            <div class="mark">税</div>
+            <div>
+                <div class="brand-name">智税通</div>
+                <div class="brand-sub">Tax Business Platform</div>
+            </div>
+        </div>
+        <h1>税务业务基础管理<br><span>一站式数字化平台</span></h1>
+        <p class="lead">覆盖纳税人登记、纳税申报、审核审批、税款缴纳、发票管理、综合查询与统计分析全流程，让征管业务更高效、更规范。</p>
+        <div class="login-features">
+            <div class="login-feature"><span class="dot">01</span>纳税人档案集中管理，信息查询快速精准</div>
+            <div class="login-feature"><span class="dot">02</span>申报审核全流程留痕，操作过程可追溯</div>
+            <div class="login-feature"><span class="dot">03</span>多维统计分析看板，业务态势一屏掌握</div>
+        </div>
+    </section>
+
+    <section class="login-card">
+        <h2>欢迎登录</h2>
+        <p class="sub">请使用税务系统账号进入业务工作台</p>
+        <div id="login-error" class="login-error"></div>
+        <form id="login-form" autocomplete="off">
+            <div class="login-field">
+                <label for="username">账号</label>
+                <div class="input-wrap">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <input id="username" name="username" type="text" placeholder="请输入登录账号" autocomplete="username" required>
+                </div>
+            </div>
+            <div class="login-field">
+                <label for="password">密码</label>
+                <div class="input-wrap">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <input id="password" name="password" type="password" placeholder="请输入登录密码" autocomplete="current-password" required>
+                </div>
+            </div>
+            <button type="submit" class="login-submit" id="login-btn">登 录</button>
+        </form>
+
+        <div class="demo-box">
+            <div class="demo-title">演示账号（点击自动填充）</div>
+            <div class="demo-accounts">
+                <div class="demo-account" data-user="admin" data-pass="admin123">
+                    <strong>系统管理员</strong>
+                    <span>admin / admin123</span>
+                </div>
+                <div class="demo-account" data-user="auditor" data-pass="audit123">
+                    <strong>审核人员</strong>
+                    <span>auditor / audit123</span>
+                </div>
+                <div class="demo-account" data-user="taxpayer" data-pass="demo123">
+                    <strong>纳税人</strong>
+                    <span>taxpayer / demo123</span>
+                </div>
+            </div>
+        </div>
+        <div class="login-foot">税务业务基础管理系统 · 数据仅用于教学演示</div>
+    </section>
+</div>
+
+<script src="assets/js/api.js"></script>
+<script>
+    (function () {
+        if (API.token()) {
+            window.location.replace('index.html');
+            return;
+        }
+        var form = document.getElementById('login-form');
+        var errorBox = document.getElementById('login-error');
+        var button = document.getElementById('login-btn');
+
+        document.querySelectorAll('.demo-account').forEach(function (item) {
+            item.addEventListener('click', function () {
+                document.getElementById('username').value = item.dataset.user;
+                document.getElementById('password').value = item.dataset.pass;
+                errorBox.classList.remove('show');
+            });
+        });
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            errorBox.classList.remove('show');
+            button.disabled = true;
+            button.textContent = '登录中...';
+            API.post('/auth/login', {
+                username: document.getElementById('username').value.trim(),
+                password: document.getElementById('password').value
+            }).then(function (data) {
+                API.setSession(data.token, data.user);
+                window.location.replace('index.html');
+            }).catch(function (error) {
+                errorBox.textContent = error.message || '登录失败，请重试';
+                errorBox.classList.add('show');
+                button.disabled = false;
+                button.textContent = '登 录';
+            });
+        });
+    })();
+</script>
+</body>
+</html>
